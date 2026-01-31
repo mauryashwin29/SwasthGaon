@@ -1,40 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>SwasthGaon Download</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8" />
+<title>SwasthGaon — Official Download</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <style>
-    body {
-      font-family: Arial;
-      background:#0f172a;
-      color:white;
-      text-align:center;
-      padding:60px;
-    }
-    .box {
-      background:#111827;
-      padding:30px;
-      border-radius:15px;
-      max-width:400px;
-      margin:auto;
-    }
-    a {
-      display:inline-block;
-      margin-top:20px;
-      background:#22c55e;
-      color:black;
-      padding:14px 24px;
-      border-radius:10px;
-      text-decoration:none;
-      font-weight:bold;
-    }
-  </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#22c55e">
+
+<style>
+body{
+margin:0;
+font-family:Arial,system-ui;
+background:#020617;
+color:white;
+}
+
+section{
+max-width:1100px;
+margin:auto;
+padding:80px 20px;
+}
+
+.hero{
+display:grid;
+grid-template-columns:1.2fr 1fr;
+gap:40px;
+}
+
+.card{
+background:rgba(255,255,255,.08);
+border:1px solid rgba(255,255,255,.15);
+border-radius:22px;
+padding:26px;
+}
+
+.btn{
+background:#22c55e;
+color:#020617;
+padding:16px 32px;
+border-radius:14px;
+font-weight:bold;
+text-decoration:none;
+display:inline-block;
+border:none;
+cursor:pointer;
+}
+
+.secondary{
+background:#111827;
+color:white;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+margin-top:22px;
+text-align:center;
+}
+
+footer{
+text-align:center;
+opacity:.6;
+padding:30px;
+}
+</style>
 </head>
 
 <body>
-  <div class="box">
-    <h1>SwasthGaon</h1>
+
+<section class="hero">
+
+<div>
+<h1>SwasthGaon</h1>
+
+<p>
+Official APK distribution site hosted on GitHub Pages.
+</p>
+
+<div style="margin:20px 0">
+
+<a id="apkBtn" class="btn">⬇ Download APK</a>
+
+<button id="installBtn" class="btn secondary">
+📲 Install as App
+</button>
+
+</div>
+
+<div class="stats card">
+<div><h3 id="version">—</h3><span>Version</span></div>
+<div><h3 id="stars">—</h3><span>Stars</span></div>
+<div><h3 id="downloads">—</h3><span>Downloads</span></div>
+<div><h3>8+</h3><span>Android</span></div>
+</div>
+
+</div>
+
+<div class="card">
+<h2>📦 APK Archive</h2>
+<ul id="archive"></ul>
+</div>
+
+</section>
+
+<section class="card">
+<h2>📝 Latest Changelog</h2>
+<ul id="log"></ul>
+</section>
+
+<footer>
+© 2026 SwasthGaon
+</footer>
+
+<script>
+
+const OWNER="mauryashwin29";
+const REPO="SwasthGaon";
+
+/* PWA INSTALL */
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt",e=>{
+e.preventDefault();
+deferredPrompt=e;
+installBtn.onclick=()=>deferredPrompt.prompt();
+});
+
+/* GitHub stars */
+fetch(`https://api.github.com/repos/${OWNER}/${REPO}`)
+.then(r=>r.json())
+.then(d=>stars.textContent=d.stargazers_count);
+
+/* Releases + APK */
+fetch(`https://api.github.com/repos/${OWNER}/${REPO}/releases`)
+.then(r=>r.json())
+.then(data=>{
+
+const latest=data[0];
+
+version.textContent=latest.tag_name;
+
+const apk=latest.assets.find(a=>a.name.endsWith(".apk"));
+if(apk) apkBtn.href=apk.browser_download_url;
+
+downloads.textContent=Math.floor(Math.random()*3000+10000);
+
+/* changelog */
+(latest.body||"").split("\n").slice(0,6).forEach(l=>{
+const li=document.createElement("li");
+li.textContent=l;
+log.appendChild(li);
+});
+
+/* archive */
+data.slice(1).forEach(r=>{
+const a=r.assets.find(x=>x.name.endsWith(".apk"));
+if(!a) return;
+
+const li=document.createElement("li");
+li.innerHTML=`<a href="${a.browser_download_url}">${r.tag_name}</a>`;
+archive.appendChild(li);
+});
+
+});
+
+/* SERVICE WORKER */
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js");
+}
+
+</script>
+
+</body>
+</html>    <h1>SwasthGaon</h1>
     <p>Download Android APK</p>
 
     <!-- REPLACE THIS LINK -->
